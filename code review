@@ -1,0 +1,86 @@
+public class Test extends TestCase
+{
+
+    public void BB(HttpRequest request, HttpResponse response) throws Throwable
+    {
+        String data;
+        if (true)
+        {
+            
+            data = request.getParameter("id");
+        }
+        else
+        {
+         
+            data = null;
+        }
+
+        Connection dBConnect = IO.getDBConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet resultS = null;
+        int id = 0;
+        try
+        {
+            id = Integer.parseInt(data);
+        }
+        catch ( NumberFormatException nfx )
+        {
+            id = -1; 
+        }
+
+        try
+        {
+            preparedStatement = dBConnect.prepareStatement("select * from table1 where id=?");
+            preparedStatement.setInt(1, id);
+
+            resultS = preparedStatement.executeQuery();
+
+           
+            IO.writeString("result requested: " + data +"\n");
+        }
+        catch (SQLException exceptSql)
+        {
+            IO.logger.log(Level.WARNING, "Error ", exceptSql);
+        }
+        finally
+        {
+            try
+            {
+                if (resultS != null)
+                {
+                    resultS.close();
+                }
+            }
+            catch (SQLException exceptSql)
+            {
+                IO.logger.log(Level.WARNING, "Could not close ResultSet", exceptSql);
+            }
+
+            try
+            {
+                if (preparedStatement != null)
+                {
+                    preparedStatement.close();
+                }
+            }
+            catch (SQLException exceptSql)
+            {
+                IO.logger.log(Level.WARNING, "Could not close PreparedStatement", exceptSql);
+            }
+
+            try
+            {
+                if (dBConnect != null)
+                {
+                    dBConnect.close();
+                }
+            }
+            catch (SQLException exceptSql)
+            {
+                IO.logger.log(Level.WARNING, "Could not close Connection", exceptSql);
+            }
+        }
+
+    }
+
+}
